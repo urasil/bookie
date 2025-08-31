@@ -6,7 +6,7 @@ pub struct Place {
     pub id: String,
     pub name: String,
     pub image: String,
-    pub desc: String,
+    pub description: String,
     pub price: f64,
     pub location: String,
     pub liked: bool,
