@@ -1,0 +1,3 @@
+backend/target/
+backend/db.sqlite
+backend/Cargo.lock
