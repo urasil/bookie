@@ -1,8 +1,6 @@
-use crate::models::structs;
 use axum::{
     extract::{Path, State},
     http::StatusCode,
-    Json,
 };
 use sqlx::SqlitePool;
 

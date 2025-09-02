@@ -6,7 +6,7 @@ pub async fn get_places(
     State(pool): State<SqlitePool>,
 ) -> Result<Json<Vec<structs::Place>>, StatusCode> {
     let places = sqlx::query_as::<_, structs::Place>(
-        "SELECT id, name, image, description, price, location, liked FROM places WHERE liked = 0",
+        "SELECT id, name, image, description, price, location, liked FROM places",
     )
     .fetch_all(&pool)
     .await;

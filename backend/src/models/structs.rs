@@ -1,5 +1,4 @@
 use serde::{Deserialize, Serialize};
-use uuid::Uuid;
 
 #[derive(Serialize, Deserialize, sqlx::FromRow)]
 pub struct Place {
@@ -14,5 +13,8 @@ pub struct Place {
 
 #[derive(Deserialize)]
 pub struct LikeAction {
+    #[allow(dead_code)]
     pub liked: bool,
+    #[allow(dead_code)]
+    pub place_id: String,
 }
