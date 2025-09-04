@@ -31,11 +31,11 @@ pub async fn setup_database() -> Result<SqlitePool, sqlx::Error>{
 
     if count == 0 {
         let places = vec![
-            ("id1", "Hotel Monaco", "https://images.unsplash.com/photo-1542312386-ef949fb5951d", "A luxurious hotel in the heart of the city.", 250.0, "New York"),
-            ("id2", "Cozy Cottage", "https://images.unsplash.com/photo-1571004169970-d85c2c776de1", "A rustic cottage by the lake.", 120.0, "Lake Placid"),
-            ("id3", "Urban Loft", "https://images.unsplash.com/photo-1517441999911-381655097402", "A modern loft with a great view.", 180.0, "Los Angeles"),
-            ("id4", "Beach House", "https://images.unsplash.com/photo-1560942544-78904791e847", "A beautiful house right on the beach.", 300.0, "Miami"),
-            ("id5", "Mountain Retreat", "https://images.unsplash.com/photo-1518296238865-c7e6c9a35d79", "A secluded retreat in the mountains.", 200.0, "Aspen"),
+            ("id1", "Hotel Monaco", "https://excellenceriviera.com/wp-content/uploads/2020/05/Hotel-De-Paris-Monaco-01.jpg", "The Hotel Monaco has the best décor of any hotel I have ever stayed in! It's loud patterned wallpaper, interesting light fixtures in both the rooms and common areas.", 250.0, "New York"),
+            ("id2", "Cozy Cottage", "https://excellenceriviera.com/wp-content/uploads/2020/05/Hotel-De-Paris-Monaco-01.jpg", "Kick back and enjoy your vacation or business trip with this beautiful 3 bedroom, 1.5 bath home.", 120.0, "Lake Placid"),
+            ("id3", "Urban Loft", "https://excellenceriviera.com/wp-content/uploads/2020/05/Hotel-De-Paris-Monaco-01.jpg", "Staying in this 55 m² apartment, nestled relatively close to Downtown Historic District, guests can relax on a sun terrace.", 180.0, "Los Angeles"),
+            ("id4", "Beach House", "https://excellenceriviera.com/wp-content/uploads/2020/05/Hotel-De-Paris-Monaco-01.jpg", "Browse 14,005 authentic Miami beach house stock photos, high-res images, and pictures.", 300.0, "Miami"),
+            ("id5", "Mountain Retreat", "https://excellenceriviera.com/wp-content/uploads/2020/05/Hotel-De-Paris-Monaco-01.jpg", "Browse 1,567 Aspen Ski Resort stock photos, pictures and royalty-free images from iStock.", 200.0, "Aspen"),
         ];
 
         for place in places {

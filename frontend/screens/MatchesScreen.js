@@ -10,7 +10,7 @@ const MatchesScreen = () =>{
 
     const fetchMatches = () => {
         setRefreshing(true);
-        fetch('http://172.20.10.2:3000/matches')
+        fetch('http://localhost:3000/matches')
             .then((response) => response.json())
             .then((data) => setMatches(data))
             .catch((error) => console.error("Error fetching matches: ", error))
@@ -34,7 +34,7 @@ const MatchesScreen = () =>{
                 <Image source={{uri: item.image}} style={styles.itemImage}/>
                 <View style={styles.itemTextContainer}>
                     <Text style={styles.itemName}>{item.name}</Text>
-                    <Text style={styles.itemLocation}>${item.price}   {item.location}</Text>
+                    <Text style={styles.itemLocation}><Text>$</Text>{item.price}   {item.location}</Text>
                 </View>
                 <Ionicons name="chevron-forward" size={24} color={Colors.gray}/>
             </TouchableOpacity>
@@ -45,7 +45,7 @@ const MatchesScreen = () =>{
         <View style={styles.emptyContainer}>
             <Ionicons name="heart-dislike-outline" size={64} color={Colors.lightGray}/>
             <Text style={styles.emptyTitle}>No Matches Yet - Keep Swiping!</Text>
-            <Text style={styles.emptySubtitle}>Swipte right on places you like to them here!</Text>
+            <Text style={styles.emptySubtitle}>Swipe right on places you like to see them here!</Text>
         </View>
     );
 

@@ -5,4 +5,6 @@ backend/Cargo.lock
 frontend/dist/
 frontend/node_modules/
 frontend/.expo
+frontend/android
+frontend/ios
 .env
