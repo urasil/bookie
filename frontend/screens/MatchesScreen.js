@@ -10,7 +10,7 @@ const MatchesScreen = () =>{
 
     const fetchMatches = () => {
         setRefreshing(true);
-        fetch('http://localhost:3000/matches')
+        fetch('http://localhost:3000/matches?user_id=test_user')
             .then((response) => response.json())
             .then((data) => setMatches(data))
             .catch((error) => console.error("Error fetching matches: ", error))

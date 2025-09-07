@@ -4,16 +4,18 @@ use axum::{
 };
 
 use crate::db::setup::setup_database;
-use crate::routes::{like::like_place, matches::get_matches, places::get_places};
+use crate::routes::{places::get_matches, places::get_places, places::like_place};
 use std::net::SocketAddr;
 use tower_http::cors::{Any, CorsLayer};
 
 mod db;
+mod google_places;
 mod models;
 mod routes;
 
 #[tokio::main]
 async fn main() {
+    dotenvy::dotenv().ok();
     let pool = setup_database().await.expect("Failed to connect to db");
 
     let cors = CorsLayer::new()

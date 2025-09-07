@@ -17,7 +17,7 @@ const PlacesScreen = () => {
   const childRef = useRef(null); 
 
   useEffect(() => {
-    fetch("http://localhost:3000/places")
+    fetch("http://localhost:3000/places?location=40.7128,-74.0060&type=restaurant")
       .then((res) => res.json())
       .then((data) => {
         if (Array.isArray(data)) {
@@ -30,10 +30,14 @@ const PlacesScreen = () => {
       .catch((err) => console.error("Error fetching places:", err));
   }, []);
 
-  const swiped = (direction, placeId) => {
-    console.log(`Swiped ${direction} on ${placeId}`);
+  const swiped = (direction, place) => {
+    console.log(`Swiped ${direction} on ${place.id}`);
     if (direction === "right") {
-      fetch(`http://localhost:3000/like/${placeId}`, { method: "POST" })
+      fetch(`http://localhost:3000/like/${place.id}`, { 
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ user_id: 'test_user', place: place}),
+      })
         .catch((err) => console.error("Error liking place:", err));
     }
     setCurrentIndex((prevIndex) => prevIndex + 1);
@@ -58,7 +62,7 @@ const PlacesScreen = () => {
           <TinderCard
             ref={childRef}
             key={currentPlace.id}
-            onSwipe={(dir) => swiped(dir, currentPlace.id)}
+            onSwipe={(dir) => swiped(dir, currentPlace)}
             onCardLeftScreen={() => outOfFrame(currentPlace.id)}
             preventSwipe={["up", "down"]}
             containerStyle={styles.tinderCardWrapper}
