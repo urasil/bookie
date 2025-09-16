@@ -24,20 +24,7 @@ pub async fn setup_database() -> Result<SqlitePool, sqlx::Error> {
     .execute(&pool)
     .await?;
 
-    sqlx::query(
-        "
-        CREATE TABLE IF NOT EXISTS places (
-            id TEXT PRIMARY KEY,
-            name TEXT NOT NULL,
-            image TEXT,
-            description TEXT,
-            price REAL,
-            location TEXT
-        );",
-    )
-    .execute(&pool)
-    .await?;
-
+    // User Likes Table
     sqlx::query(
         "
         CREATE TABLE IF NOT EXISTS user_likes (
@@ -47,7 +34,7 @@ pub async fn setup_database() -> Result<SqlitePool, sqlx::Error> {
             FOREIGN KEY (user_id) REFERENCES users(id)
             FOREIGN KEY (place_id) REFERENCES places(id)
         );
-    ",
+        ",
     )
     .execute(&pool)
     .await?;

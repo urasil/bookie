@@ -1,23 +1,25 @@
-use crate::{google_places, models::structs};
+use crate::app_state::AppState;
+use crate::models::structs::{Place, PlaceDetails};
 use axum::{
     extract::{Path, Query, State},
     http::StatusCode,
     Json,
 };
 use sqlx::SqlitePool;
-use std::env;
+use std::sync::Arc;
 
 #[derive(serde::Deserialize)]
 pub struct SearchQuery {
-    location: String,
-    #[serde(rename = "type")]
-    place_type: String,
+    pub query: String,
+    pub lat: f64,
+    pub lng: f64,
+    pub radius: i32,
 }
 
 #[derive(serde::Deserialize)]
 pub struct LikeParams {
-    user_id: String,
-    place: structs::Place,
+    pub user_id: String,
+    pub liked: bool,
 }
 
 #[derive(serde::Deserialize)]
@@ -26,50 +28,29 @@ pub struct MatchesQuery {
 }
 
 pub async fn get_places(
-    State(pool): State<SqlitePool>,
+    State(state): State<Arc<AppState>>,
     Query(params): Query<SearchQuery>,
-) -> Result<Json<Vec<structs::Place>>, StatusCode> {
-    let api_key = env::var("GOOGLE_PLACES_API_KEY").expect("missing api key");
-    let places = google_places::search_places(&api_key, &params.location, &params.place_type).await;
+) -> Result<Json<Vec<Place>>, StatusCode> {
+    let gp = &state.gp;
+    let places = gp
+        .search_places(&params.query, params.lat, params.lng, params.radius)
+        .await;
 
     match places {
-        Ok(places) => {
-            for place in &places {
-                let _ = sqlx::query("INSERT OR IGNORE INTO places (id, name, image, description, price, location) VALUES (?, ?, ?, ?, ?, ?)")
-                    .bind(&place.id)
-                    .bind(&place.name)
-                    .bind(&place.image)
-                    .bind(&place.description)
-                    .bind(place.price)
-                    .bind(&place.location)
-                    .execute(&pool)
-                    .await;
-            }
-            Ok(Json(places))
-        }
+        Ok(places) => Ok(Json(places)),
         Err(_) => Err(StatusCode::INTERNAL_SERVER_ERROR),
     }
 }
 
 pub async fn like_place(
-    Path(id): Path<String>,
-    State(pool): State<SqlitePool>,
+    Path(place_id): Path<String>,
+    State(state): State<Arc<AppState>>,
     Json(payload): Json<LikeParams>,
 ) -> Result<StatusCode, StatusCode> {
-    let _ = sqlx::query("INSER OR IGNORE INTO places (id, name, image, description, price, location) VALUES (?, ?, ?, ?, ?, ?)")
-        .bind(&payload.place.id)
-        .bind(&payload.place.name)
-        .bind(&payload.place.image)
-        .bind(&payload.place.description)
-        .bind(payload.place.price)
-        .bind(&payload.place.location)
-        .execute(&pool)
-        .await;
-
-    let result = sqlx::query("INSERT OR IGNORE INTO user_likes (user_id, place_id) VALUES (?, ?)")
+    let result = sqlx::query("INSERT OR REPLACE INTO user_likes (user_id, place_id) VALUES (?, ?)")
         .bind(payload.user_id)
-        .bind(id)
-        .execute(&pool)
+        .bind(place_id)
+        .execute(&state.pool)
         .await;
 
     match result {
@@ -79,17 +60,25 @@ pub async fn like_place(
 }
 
 pub async fn get_matches(
-    State(pool): State<SqlitePool>,
+    State(state): State<Arc<AppState>>,
     Query(params): Query<MatchesQuery>,
-) -> Result<Json<Vec<structs::Place>>, StatusCode> {
-    let matches =
-        sqlx::query_as::<_, structs::Place>("SELECT p.id, p.name, p.image, p.description, p.price, p.location, 1 as liked FROM places p INNER JOIN user_likes ul ON p.id = ul.place_id WHERE ul.user_id = ?",)
+) -> Result<Json<Vec<PlaceDetails>>, StatusCode> {
+    let gp = &state.gp;
+    let liked_places: Result<Vec<String>, sqlx::Error> =
+        sqlx::query_scalar("SELECT place_id FROM user_likes WHERE user_id = ?")
             .bind(params.user_id)
-            .fetch_all(&pool)
+            .fetch_all(&state.pool)
             .await;
-
-    match matches {
-        Ok(matches) => Ok(Json(matches)),
+    match liked_places {
+        Ok(rows) => {
+            let mut results = vec![];
+            for place_id in rows {
+                if let Ok(details) = gp.get_place_details(&place_id).await {
+                    results.push(details);
+                }
+            }
+            Ok(Json(results))
+        }
         Err(_) => Err(StatusCode::INTERNAL_SERVER_ERROR),
     }
 }
